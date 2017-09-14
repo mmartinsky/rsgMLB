@@ -1,4 +1,5 @@
 var Twitter = require('twitter');
+var Xlsx = require('xlsx');
 
 exports.handler = function (event, context) {
     context.succeed('hello world');

@@ -13,7 +13,7 @@
     "claudia": "^2.14.2"
   },
   "dependencies": {
-    "google-spreadsheet": "^2.0.4",
-    "twitter": "^1.7.1"
+    "twitter": "^1.7.1",
+    "xlsx": "^0.11.3"
   }
 }
