@@ -4,8 +4,8 @@
   "description": "Remembering some guys",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "claudia create --version dev --region us-west-2 --handler lambda.handler" 
+    "test": "claudia test-lambda",
+    "deploy": "claudia create --version dev --region us-west-2 --handler lambda.handler"
   },
   "author": "mmartinsky",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "claudia": "^2.14.2"
   },
   "dependencies": {
+    "google-spreadsheet": "^2.0.4",
     "twitter": "^1.7.1"
   }
 }
