@@ -1,0 +1,18 @@
+{
+  "name": "rsg",
+  "version": "1.0.0",
+  "description": "Remembering some guys",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "claudia create --version dev --region us-west-2 --handler lambda.handler" 
+  },
+  "author": "mmartinsky",
+  "license": "ISC",
+  "devDependencies": {
+    "claudia": "^2.14.2"
+  },
+  "dependencies": {
+    "twitter": "^1.7.1"
+  }
+}

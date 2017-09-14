@@ -1,0 +1,7 @@
+{
+  "lambda": {
+    "role": "rsg-executor",
+    "name": "rsg",
+    "region": "us-west-2"
+  }
+}
