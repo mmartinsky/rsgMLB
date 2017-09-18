@@ -10,9 +10,12 @@
   "author": "mmartinsky",
   "license": "ISC",
   "devDependencies": {
-    "claudia": "^2.14.2"
+    "claudia": "^2.14.2",
+    "eslint": "^4.7.0"
   },
   "dependencies": {
+    "axios": "^0.16.2",
+    "cheerio": "^1.0.0-rc.2",
     "twitter": "^1.7.1",
     "xlsx": "^0.11.3"
   }
