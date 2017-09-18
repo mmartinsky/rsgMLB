@@ -14,7 +14,7 @@ function populatePlayerYears() {
                 var htmlPromise = axios.get(url, {
                     data: {
                         rowIndex: i,
-                        playerName : player.Name
+                        playerName: player.Name
                     }
                 });
                 htmlPromise.then(resp => {
@@ -30,15 +30,15 @@ function populatePlayerYears() {
                     this.sheet['C' + (parseInt(rowIndex) + 2)] = {
                         t: 'n',
                         v: endYr
-                    };                   
-                    console.log("Success: " + JSON.parse(resp.config.data).playerName);
-                }).catch(err => {
-                    console.log("Failed: " + JSON.parse(err.config.data).playerName);
+                    };
+                    //console.log("Success: " + JSON.parse(resp.config.data).playerName);
+                }).catch(() => {
+                    //console.log("Failed: " + JSON.parse(err.config.data).playerName);
                 });
-            };
-        }, 10000, i);          
+            }
+        }, 10000, i);
     }
-    Xlsx.writeFile(this.wb, 'RememberSomeGuys.csv');   
+    Xlsx.writeFile(this.wb, 'RememberSomeGuys.csv');
 }
 
 populatePlayerYears();
