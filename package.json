@@ -11,7 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "claudia": "^2.14.2",
-    "eslint": "^4.7.0"
+    "eslint": "^4.7.0",
+    "eslint-config-google": "^0.9.1"
   },
   "dependencies": {
     "axios": "^0.16.2",
