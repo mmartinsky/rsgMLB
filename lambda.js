@@ -1,5 +1,6 @@
-var Twitter = require('twitter');
+var Twitter = require('twit');
 var Xlsx = require('xlsx');
+var i2b = require("imageurl-base64");
 
 exports.handler = function (event, context) {
     // get random player from spreadsheet
@@ -8,14 +9,37 @@ exports.handler = function (event, context) {
     var textForTweet = createTextForTweet(player);
     console.log(textForTweet);
     // tweet it 
+    var client = new Twitter({
+        consumer_key: process.env.TWITTER_CONSUMER_KEY,
+        consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+        access_token: process.env.TWITTER_ACCESS_TOKEN_KEY,
+        access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 
-    // set player to used
+    });
+    i2b("http://mlb.mlb.com/assets/images/1/0/6/102773106/Angelsjerz_iksbc8u6.jpg", function (err, data) {
+        if (err) {
+            console.log("error converting image to base64");
+            console.log(err);
+        } else {
+            console.log(data);
+            client.post('statuses/update', {
+                    status: textForTweet
+                },
+                function (error, tweet, response) {
+                    console.log("---------------");
+                    if (error) {
+                        console.log(error);
+                    }
+                    console.log(tweet); // Tweet body. 
+                    // console.log(response); // Raw response object. 
+                });
+        }
+    });
 };
 
 function createTextForTweet(player) {
     var result = "Remember " + player.Name + "?\n";
-    result += player.Start + " - " + player.End + "\n";
-    result += "AVG: " + player.AVG.substring(1) + ", HR: " + player.HR + ", RBI: " + player.RBI + ", WAR: " + player.WAR + "\n";
+    result += player.Start + " - " + player.End + ". " + "AVG: " + player.AVG.substring(1) + ", HR: " + player.HR + ", RBI: " + player.RBI + ", WAR: " + player.WAR + "\n";
     result += 'http://www.fangraphs.com/statss.aspx?playerid=' + player.playerid;
     result += "\n#rsgMLB";
     console.log(result.length);
