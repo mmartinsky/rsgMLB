@@ -2,7 +2,7 @@ var Twitter = require('twit');
 var Xlsx = require('xlsx');
 var i2b = require("imageurl-base64");
 
-exports.handler = function (event, context) {
+exports.handler = function () {
     // get random player from spreadsheet
     var player = getPlayer();
     // create text for tweet
@@ -18,21 +18,43 @@ exports.handler = function (event, context) {
     });
     i2b("http://mlb.mlb.com/assets/images/1/0/6/102773106/Angelsjerz_iksbc8u6.jpg", function (err, data) {
         if (err) {
-            console.log("error converting image to base64");
-            console.log(err);
+            console.error("error converting image to base64");
+            console.error(err);
         } else {
-            console.log(data);
-            client.post('statuses/update', {
-                    status: textForTweet
-                },
-                function (error, tweet, response) {
-                    console.log("---------------");
-                    if (error) {
-                        console.log(error);
+            client.post('media/upload', {
+                media_data: data.base64
+            }, function (err, data) {
+                if (err) {
+                    console.error("Error uploading media.");
+                    console.error(err);
+                } else {
+                    var mediaIdStr = data.media_id_string
+                    var altText = "RSG: " + player.Name + ", " + Date();
+                    var meta_params = {
+                        media_id: mediaIdStr,
+                        alt_text: {
+                            text: altText
+                        }
                     }
-                    console.log(tweet); // Tweet body. 
-                    // console.log(response); // Raw response object. 
-                });
+
+                    client.post('media/metadata/create', meta_params, function (err) {
+                        if (err) {
+                            console.error("error creating media metadata");
+                            console.error(err);
+                        } else {
+                            // now we can reference the media and post a tweet (media will attach to the tweet)
+                            var params = {
+                                status: textForTweet,
+                                media_ids: [mediaIdStr]
+                            }
+
+                            client.post('statuses/update', params, function () {
+                                console.error("Success");
+                            })
+                        }
+                    });
+                }
+            });
         }
     });
 };
