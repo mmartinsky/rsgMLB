@@ -1,8 +1,8 @@
 var Twitter = require('twit');
 var i2b = require("imageurl-base64");
 var aws = require('aws-sdk');
-var csv = require('csvtojson')
-
+var csv = require('csvtojson');
+var json2csv = require('json2csv');
 
 var jsObj;
 var index;
@@ -71,7 +71,11 @@ function getPictureAndPostTweet(player, textForTweet) {
                                 } else {
                                     console.log("Tweet Success");
                                     jsObj[index].Used = 'Y';
-                                    var jsonStringCsv = JSON.stringify(jsObj);
+                                    var jsonStringCsv = json2csv({
+                                        data: jsObj,
+                                        quotes: ''
+                                    });
+                                    //console.log(jsonStringCsv);
                                     var params = {
                                         Body: jsonStringCsv,
                                         Bucket: "rsg-mlb",
