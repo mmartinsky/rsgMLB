@@ -34,10 +34,10 @@ function populatePlayerYears() {
                     console.log("Success: " + JSON.parse(resp.config.data).playerName);
                     Xlsx.writeFile(this.wb, 'RememberSomeGuys.csv');
                 }).catch((err) => {
-                    //console.log("Failed: " + JSON.parse(err.config.data).playerName);
+                    console.log("Failed: " + JSON.parse(err.config.data).playerName + " - " + err.message);
                 });
             }
-        }, 10000, i);
+        }, 1000, i);
     }
 }
 
