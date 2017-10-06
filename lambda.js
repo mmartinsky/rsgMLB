@@ -6,12 +6,34 @@ var json2csv = require('json2csv');
 
 var jsObj;
 var index;
+var awsRequestId = null;
+var contextG;
+var eventG;
+var ctr = 0;
 
-exports.handler = function () {
+exports.handler = function (event, context) {
+    console.log("At start, ARI = " + awsRequestId);
+    contextG = context;
+    eventG = event;
+    if (event !== null && event !== undefined && awsRequestId === event.id) {
+        console.log("same event");
+        return;
+    } else if (event !== null && event !== undefined && awsRequestId === null) {
+        awsRequestId = event.id;
+        console.log("awsRequestId getting set to: " + awsRequestId);
+    }
     var fileProm = downloadFile();
     fileProm.then(function (data) {
+        console.log("file downloaded");
         var playerPromise = getPlayer(data.Body.toString('utf-8'));
         playerPromise.then(function (data) {
+            if (ctr !== 0) {
+                console.log("skipping rd 2");
+                return;
+            } else {
+                console.log("1st time through");
+                ctr++;
+            }
             console.log(data);
             var player = data;
             var textForTweet = createTextForTweet(player);
@@ -21,6 +43,8 @@ exports.handler = function () {
     }).catch(function (err) {
         console.log("error");
         console.log(err);
+        if (contextG !== undefined && contextG !== null)
+            contextG.fail('getting S3 file');
     });
 };
 
@@ -36,6 +60,8 @@ function getPictureAndPostTweet(player, textForTweet) {
         if (err) {
             console.error("error converting image to base64");
             console.error(err);
+            if (contextG !== undefined && contextG !== null)
+                contextG.fail('converting image');
         } else {
             client.post('media/upload', {
                 media_data: data.base64
@@ -43,6 +69,8 @@ function getPictureAndPostTweet(player, textForTweet) {
                 if (err) {
                     console.error("Error uploading media.");
                     console.error(err);
+                    if (contextG !== undefined && contextG !== null)
+                        contextG.fail('uploading picture');
                 } else {
                     var mediaIdStr = data.media_id_string
                     var altText = "RSG: " + player.Name + ", " + Date();
@@ -57,6 +85,8 @@ function getPictureAndPostTweet(player, textForTweet) {
                         if (err) {
                             console.error("error creating media metadata");
                             console.error(err);
+                            if (contextG !== undefined && contextG !== null)
+                                contextG.fail('adding metadata');
                         } else {
                             // now we can reference the media and post a tweet (media will attach to the tweet)
                             var params = {
@@ -68,6 +98,8 @@ function getPictureAndPostTweet(player, textForTweet) {
                                 if (err) {
                                     console.log("Error posting Tweet");
                                     console.log(err);
+                                    if (contextG !== undefined && contextG !== null)
+                                        contextG.fail('post tweet');
                                 } else {
                                     console.log("Tweet Success");
                                     jsObj[index].Used = 'Y';
@@ -89,8 +121,13 @@ function getPictureAndPostTweet(player, textForTweet) {
                                     client.putObject(params, function (err, data) {
                                         if (err) {
                                             console.log(err, err.stack);
+                                            if (contextG !== undefined && contextG !== null)
+                                                contextG.fail('putObject back to S3');
                                         } else {
                                             console.log(data);
+                                            if (contextG !== undefined && contextG !== null) {
+                                                contextG.succeed();
+                                            }
                                         }
                                     });
                                 }

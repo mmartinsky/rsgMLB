@@ -1,5 +1,11 @@
 .vscode/launch.json
 .eslintrc.json
+deploy.env
+.lambda
+context.json
+event.json
+event_sources.json
+rsg-development.zip
 
 # Logs
 logs
