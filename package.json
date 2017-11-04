@@ -11,9 +11,10 @@
   "author": "mmartinsky",
   "license": "ISC",
   "devDependencies": {
-    "node-lambda": "^0.11.4",
     "eslint": "^4.7.0",
-    "eslint-config-google": "^0.9.1"
+    "eslint-config-google": "^0.9.1",
+    "node-lambda": "^0.11.4",
+    "xlsx": "^0.11.7"
   },
   "dependencies": {
     "aws-sdk": "^2.125.0",
