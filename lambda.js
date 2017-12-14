@@ -8,10 +8,8 @@ var jsObj;
 var index;
 var awsRequestId = null;
 var contextG;
-var eventG;
-var ctr = 0;
-
 exports.handler = function (event, context) {
+    // download CSV file from S3
     console.log("At start, ARI = " + awsRequestId);
     contextG = context;
     eventG = event;
@@ -25,20 +23,17 @@ exports.handler = function (event, context) {
     var fileProm = downloadFile();
     fileProm.then(function (data) {
         console.log("file downloaded");
+        // get player from file
         var playerPromise = getPlayer(data.Body.toString('utf-8'));
         playerPromise.then(function (data) {
-            if (ctr !== 0) {
-                console.log("skipping rd 2");
-                return;
-            } else {
-                console.log("1st time through");
-                ctr++;
-            }
+            console.log("Player found.");
             console.log(data);
             var player = data;
             var textForTweet = createTextForTweet(player);
             console.log(textForTweet);
             getPictureAndPostTweet(player, textForTweet);
+        }).catch(function(err){
+            console.log("Error getting player from spreadsheet");
         });
     }).catch(function (err) {
         console.log("error");
@@ -56,13 +51,15 @@ function getPictureAndPostTweet(player, textForTweet) {
         access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 
     });
+    // fetches image from URL and converts to base64 for upload
     i2b(player.Picture, function (err, data) {
         if (err) {
             console.error("error converting image to base64");
             console.error(err);
             if (contextG !== undefined && contextG !== null)
-                contextG.fail('converting image');
+                contextG.fail('Failed at converting image');
         } else {
+            // upload image
             client.post('media/upload', {
                 media_data: data.base64
             }, function (err, data) {
@@ -70,7 +67,7 @@ function getPictureAndPostTweet(player, textForTweet) {
                     console.error("Error uploading media.");
                     console.error(err);
                     if (contextG !== undefined && contextG !== null)
-                        contextG.fail('uploading picture');
+                        contextG.fail('Failed at uploading picture');
                 } else {
                     var mediaIdStr = data.media_id_string
                     var altText = "RSG: " + player.Name + ", " + Date();
@@ -80,7 +77,7 @@ function getPictureAndPostTweet(player, textForTweet) {
                             text: altText
                         }
                     }
-
+                    // create metadata on image for adding to tweet
                     client.post('media/metadata/create', meta_params, function (err) {
                         if (err) {
                             console.error("error creating media metadata");
@@ -93,7 +90,7 @@ function getPictureAndPostTweet(player, textForTweet) {
                                 status: textForTweet,
                                 media_ids: [mediaIdStr]
                             }
-
+                            // post tweet
                             client.post('statuses/update', params, function (err) {
                                 if (err) {
                                     console.log("Error posting Tweet");
@@ -101,6 +98,7 @@ function getPictureAndPostTweet(player, textForTweet) {
                                     if (contextG !== undefined && contextG !== null)
                                         contextG.fail('post tweet');
                                 } else {
+                                    // tweet successful - update spreadsheet
                                     console.log("Tweet Success");
                                     jsObj[index].Used = 'Y';
                                     var jsonStringCsv = json2csv({
@@ -114,6 +112,7 @@ function getPictureAndPostTweet(player, textForTweet) {
                                         Key: "RememberSomeGuys.csv",
                                         ContentType: "text/csv"
                                     };
+                                    // put spreadsheet back on S3
                                     var client = new aws.S3({
                                         accessKeyId: process.env.AWS_KEY,
                                         secretAccessKey: process.env.AWS_SECRET
@@ -122,7 +121,7 @@ function getPictureAndPostTweet(player, textForTweet) {
                                         if (err) {
                                             console.log(err, err.stack);
                                             if (contextG !== undefined && contextG !== null)
-                                                contextG.fail('putObject back to S3');
+                                                contextG.fail('Failed on putObject back to S3');
                                         } else {
                                             console.log(data);
                                             if (contextG !== undefined && contextG !== null) {
@@ -145,7 +144,6 @@ function createTextForTweet(player) {
     result += player.Start + " - " + player.End + ". " + "AVG: " + player.AVG.substring(1) + ", HR: " + player.HR + ", RBI: " + player.RBI + ", WAR: " + player.WAR + "\n";
     result += 'http://www.fangraphs.com/statss.aspx?playerid=' + player.playerid;
     result += "\n#rsgMLB #MLB #baseball";
-    console.log(result.length);
     return result;
 }
 

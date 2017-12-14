@@ -4,9 +4,8 @@
   "description": "Remembering some guys",
   "main": "index.js",
   "scripts": {
-    "claudia_test": "claudia test-lambda",
-    "deploy": "claudia create --version dev --region us-west-2 --handler lambda.handler",
-    "update": "claudia update"
+    "setup": "node-lambda setup",
+    "deploy": "node-lambda deploy -n rsg -H lambda.handler -t 20 -f deploy.env"
   },
   "author": "mmartinsky",
   "license": "ISC",
