@@ -1,31 +1,31 @@
 {
-  "name": "rsg",
+  "name": "twitter-lambda-bot",
   "version": "1.0.0",
-  "description": "Remembering some guys",
   "main": "index.js",
   "scripts": {
-    "setup": "node-lambda setup",
-    "deploy": "node-lambda deploy -n rsg -H lambda.handler -t 20 -f deploy.env"
+    "build": "tsc",
+    "start": "ts-node src/local.ts",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
-  "author": "mmartinsky",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "eslint": "^4.7.0",
-    "eslint-config-google": "^0.9.1",
-    "node-lambda": "^0.11.4",
-    "xlsx": "^0.11.7"
-  },
+  "description": "",
   "dependencies": {
-    "aws-sdk": "^2.125.0",
-    "axios": "^0.16.2",
-    "cheerio": "^1.0.0-rc.2",
-    "csvtojson": "^1.1.7",
-    "imageurl-base64": "^1.0.0",
-    "jimp": "^0.2.28",
-    "json2csv": "^3.11.2",
-    "twit": "^2.2.9"
+    "@types/aws-lambda": "^8.10.145",
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "twitter-api-sdk": "^1.2.1",
+    "twitter-api-v2": "^1.18.0",
+    "typescript": "^5.6.2"
   },
-  "files": [
-    "lambda.js"
-  ]
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.7.4",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2"
+  }
 }
