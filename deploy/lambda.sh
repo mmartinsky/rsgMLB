@@ -4,6 +4,7 @@ FUNCTION_NAME="rsg-mlb-bot"
 RUNTIME="nodejs20.x"
 ROLE="arn:aws:iam::016670670970:role/LambdaTwitterBotRole"
 HANDLER="dist/handler.handler"
+TIMEOUT=45
 
 source .env
 
@@ -35,10 +36,17 @@ zip -r deployment.zip dist node_modules
 aws lambda get-function --function-name $FUNCTION_NAME > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     # Function exists, update it
-    echo "Updating existing Lambda function..."
+    echo "Updating existing Lambda function code..."
     aws lambda update-function-code \
         --function-name $FUNCTION_NAME \
         --zip-file fileb://deployment.zip
+
+    echo "Updated function code".
+
+    echo "Sleeping for 5 seconds..."
+    sleep 5
+
+    echo "Updating function configuration..."
 
     # Update the function configuration
     aws lambda update-function-configuration \
@@ -46,6 +54,7 @@ if [ $? -eq 0 ]; then
         --runtime $RUNTIME \
         --handler $HANDLER \
         --role $ROLE \
+        --timeout $TIMEOUT \
         --environment "$ENV_VARS"
 else
     # Function doesn't exist, create it
@@ -55,6 +64,7 @@ else
         --runtime $RUNTIME \
         --role $ROLE \
         --handler $HANDLER \
+        --timeout $TIMEOUT \
         --zip-file fileb://deployment.zip \
         --environment "$ENV_VARS"
 fi

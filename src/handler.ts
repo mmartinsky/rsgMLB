@@ -40,7 +40,7 @@ WAR: ${playerData.war.toFixed(1)}\n
 ${playerData.url}
     `.trim();
   }
-  tweetText+= '\n\n#MLB #Baseball #RememberSomeGuys #Stats'
+  tweetText += '\n\n#MLB #Baseball #RememberSomeGuys #Stats'
 
 
   // fetch imageUrl and convert to base64
@@ -112,6 +112,7 @@ async function getRandomPlayerLink(): Promise<string> {
 
 // Lambda handler function
 export const handler: Handler = async (event, context) => {
+  console.log("Starting Execution")
   try {
     const client = new TwitterApi({
       appKey: process.env.TWITTER_API_KEY!,
@@ -120,15 +121,19 @@ export const handler: Handler = async (event, context) => {
       accessSecret: process.env.TWITTER_ACCESS_SECRET!,
     });
 
+    console.log("Fetching random player link")
 
-    // Call the function before generating the tweet
     const randomPlayerLink = await getRandomPlayerLink();
     console.log(`Random player found: ${randomPlayerLink}`);
+
     const playerPageHtml = await fetchPlayerPage(randomPlayerLink);
     const playerData = parsePlayerData(playerPageHtml, randomPlayerLink);
     console.log(`Player data: ${JSON.stringify(playerData)}`);
+    
     const tweetConfig = await generateTweetConfig(playerData, client);
     const tweetData = await client.v2.tweet(tweetConfig.text, tweetConfig.params);
+    
+    console.log("Tweeted:", tweetData);
     return { statusCode: 200, body: JSON.stringify(tweetData) };
   } catch (error) {
     console.error('Error:', error);
