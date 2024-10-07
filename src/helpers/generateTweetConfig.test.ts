@@ -1,5 +1,5 @@
-import { generateTweetConfig } from '../src/generateTweetConfig';
-import { PlayerData } from '../src/parsePlayer';
+import { generateTweetConfig } from './generateTweetConfig';
+import { PlayerData } from './parsePlayer';
 import TwitterApi from 'twitter-api-v2';
 import axios from 'axios';
 

@@ -4,7 +4,7 @@ import path from 'path';
 
 describe('parsePlayerData', () => {
   it('should correctly parse position player data from HTML', () => {
-    const html = fs.readFileSync(path.join(__dirname, 'sample_data', 'casey_blake.html'), 'utf-8');
+    const html = fs.readFileSync(path.join(__dirname, '..', 'sample_data', 'casey_blake.html'), 'utf-8');
     const baseUrl = 'https://www.baseball-reference.com/players/b/blakeca01.shtml';
     
     const result = parsePlayerData(html, baseUrl);
@@ -21,7 +21,7 @@ describe('parsePlayerData', () => {
     });
   });
   it('should correctly parse pitcher data from HTML', () => {
-    const html = fs.readFileSync(path.join(__dirname, 'sample_data', 'ron_guidry.html'), 'utf-8');
+    const html = fs.readFileSync(path.join(__dirname, '..', 'sample_data', 'ron_guidry.html'), 'utf-8');
     const baseUrl = 'https://www.baseball-reference.com/players/g/guidrror01.shtml';
     
     const result = parsePlayerData(html, baseUrl);

@@ -2,8 +2,8 @@ import { Handler } from 'aws-lambda';
 import { TwitterApi } from "twitter-api-v2";
 import axios from 'axios';
 import * as dotenv from "dotenv";
-import { parsePlayerData } from './parsePlayer';
-import { generateTweetConfig } from './generateTweetConfig';
+import { parsePlayerData } from './helpers/parsePlayer';
+import { generateTweetConfig } from './helpers/generateTweetConfig';
 import { loadWarTablePage } from './helpers/getWarTable';
 
 dotenv.config();
