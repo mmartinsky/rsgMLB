@@ -20,7 +20,7 @@ This repository contains the code for the @rsgMLB Twitter Bot, an automated syst
 - TypeScript
 - Node.js
 - AWS Lambda
-- Twitter API (via twitter-api-v2 and twitter-api-sdk)
+- Twitter API (via twitter-api-v2)
 - Cheerio for HTML parsing
 - Axios for HTTP requests
 - Jest for testing
