@@ -14,43 +14,60 @@ interface TweetConfig {
   params: Partial<SendTweetV2Params>;
 }
 
-async function generateTweetConfig(playerData: PlayerData): Promise<TweetConfig> {
+async function generateTweetConfig(playerData: PlayerData, client: TwitterApi): Promise<TweetConfig> {
+  let tweetText: string;
 
-  const text = `
-  Remember ${playerData.name}?\n(${playerData.years}). AVG: ${playerData.average}. HR: ${playerData.hr}. RBI: ${playerData.rbi}. WAR: ${playerData.war}\n${playerData.url}
-  `;
+  if ('average' in playerData) {
+    // Position player
+    tweetText = `
+Remember ${playerData.name}?
+(${playerData.years})
+AVG: ${playerData.average.toFixed(3).slice(1)}
+HR: ${playerData.hr}
+RBI: ${playerData.rbi}
+WAR: ${playerData.war.toFixed(1)}\n
+${playerData.url}
+    `.trim();
+  } else {
+    // Pitcher
+    tweetText = `
+Remember ${playerData.name}?
+(${playerData.years})
+W-L: ${playerData.wins}-${playerData.losses}
+ERA: ${playerData.era.toFixed(2)}
+SO: ${playerData.strikeouts}
+WAR: ${playerData.war.toFixed(1)}\n
+${playerData.url}
+    `.trim();
+  }
+  tweetText+= ' #MLB #Baseball #RememberSomeGuys #Stats'
+
+
   // fetch imageUrl and convert to base64
   if (!playerData.imageUrl) {
     return {
-      text: text,
+      text: tweetText,
       params: {},
     };
   }
   console.log("Image URL:", playerData.imageUrl);
   const imageUrl = playerData.imageUrl;
-  const image = await axios.get(imageUrl);
-  const imageBuffer = Buffer.from(image.data, 'binary');
-  const base64Image = imageBuffer.toString('base64');
+  const image = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+  const base64Image = Buffer.from(image.data, 'binary').toString('base64')
 
-  // console.log("Base64 Image:", base64Image);
   // Upload the image to Twitter
-  const client = new TwitterApi(process.env.TWITTER_BEARER_TOKEN as string);
-  const mediaId = await client.v1.uploadMedia(Buffer.from(base64Image, 'base64'), { mimeType: 'image/jpeg', target: 'tweet' });
-  
+  const b64Image = Buffer.from(base64Image, 'base64');
+  const mediaId = await client.v1.uploadMedia(b64Image, { mimeType: 'image/jpeg', target: 'tweet' });
+
   console.log("Media ID:", mediaId);
 
   return {
-    text: text,
+    text: tweetText,
     params: {
       media: {
         media_ids: [mediaId]
       }
     },
-  };
-
-  return {
-    text: text,
-    params: {},
   };
 }
 
@@ -110,9 +127,9 @@ export const handler: Handler = async (event, context) => {
     const playerPageHtml = await fetchPlayerPage(randomPlayerLink);
     const playerData = parsePlayerData(playerPageHtml, randomPlayerLink);
     console.log(`Player data: ${JSON.stringify(playerData)}`);
-    const tweetConfig = await generateTweetConfig(playerData);
-    // const tweetData = await client.v2.tweet(tweetConfig.text, tweetConfig.params);
-    return { statusCode: 200, body: JSON.stringify(tweetConfig) };
+    const tweetConfig = await generateTweetConfig(playerData, client);
+    const tweetData = await client.v2.tweet(tweetConfig.text, tweetConfig.params);
+    return { statusCode: 200, body: JSON.stringify(tweetData) };
   } catch (error) {
     console.error('Error:', error);
     return { statusCode: 500, body: JSON.stringify(error) };
