@@ -8,11 +8,11 @@ async function getWarTablePage(): Promise<void> {
     const response = await axios.get(baseUrl);
     const $ = cheerio.load(response.data);
 
-    fs.writeFileSync('war_table.html', response.data);
+    fs.writeFileSync('src/sample_data/war_table.html', response.data);
   }
 
   export function loadWarTablePage(): cheerio.CheerioAPI {
-    const html = fs.readFileSync('war_table.html', 'utf8');
+    const html = fs.readFileSync('src/sample_data/war_table.html', 'utf8');
     return cheerio.load(html);
   }
 

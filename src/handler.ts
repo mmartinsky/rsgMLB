@@ -40,7 +40,7 @@ WAR: ${playerData.war.toFixed(1)}\n
 ${playerData.url}
     `.trim();
   }
-  tweetText+= ' #MLB #Baseball #RememberSomeGuys #Stats'
+  tweetText+= '\n\n#MLB #Baseball #RememberSomeGuys #Stats'
 
 
   // fetch imageUrl and convert to base64
