@@ -3,7 +3,18 @@
 FUNCTION_NAME="rsg-mlb-bot"
 RUNTIME="nodejs20.x"
 ROLE="arn:aws:iam::016670670970:role/LambdaTwitterBotRole"
-HANDLER="handler.handler"
+HANDLER="dist/handler.handler"
+
+source .env
+
+ENV_VARS='{
+    "Variables": {
+        "TWITTER_API_KEY":"'$TWITTER_API_KEY'",
+        "TWITTER_API_SECRET":"'$TWITTER_API_SECRET'",
+        "TWITTER_ACCESS_TOKEN":"'$TWITTER_ACCESS_TOKEN'",
+        "TWITTER_ACCESS_SECRET":"'$TWITTER_ACCESS_SECRET'"
+    }
+}'
 
 # Build the project
 echo "Building the project..."
@@ -17,6 +28,7 @@ fi
 
 # Create a deployment package
 echo "Creating deployment package..."
+cp -r src/sample_data dist/sample_data
 zip -r deployment.zip dist node_modules
 
 # Check if the Lambda function exists
@@ -33,7 +45,8 @@ if [ $? -eq 0 ]; then
         --function-name $FUNCTION_NAME \
         --runtime $RUNTIME \
         --handler $HANDLER \
-        --role $ROLE
+        --role $ROLE \
+        --environment "$ENV_VARS"
 else
     # Function doesn't exist, create it
     echo "Creating new Lambda function..."
@@ -42,7 +55,8 @@ else
         --runtime $RUNTIME \
         --role $ROLE \
         --handler $HANDLER \
-        --zip-file fileb://deployment.zip
+        --zip-file fileb://deployment.zip \
+        --environment "$ENV_VARS"
 fi
 
 # Check if the deployment was successful
